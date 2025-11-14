@@ -229,8 +229,12 @@ int entryPoint(Commands commands)
 
     configureLoggingProvider(new shared DefaultProvider(true, commands.debug_ ? Levels.DEBUG : Levels.INFO));
     
-    if (commands.threadCount != uint.max) {
-        defaultPoolThreads = commands.threadCount;
+    try {
+        if (commands.threadCount != uint.max) {
+            defaultPoolThreads = commands.threadCount;
+        }
+    } catch (Exception ex) {
+        getLogger().warningF!"Failed to set thread pool size: %s"(ex.msg);
     }
 
     try

@@ -16,11 +16,14 @@
     },
     "dflags-ldc": [
         "--link-defaultlib-shared=false",
-        "--disable-gc2stack"
+        "--disable-gc2stack",
+        "--flto=thin"
     ],
     
     "lflags-osx": [
-        "-lpthread"
+        "-lpthread",
+        "-framework", "Foundation",
+        "-framework", "CoreFoundation"
     ],
 
     "dflags-gdc": [
