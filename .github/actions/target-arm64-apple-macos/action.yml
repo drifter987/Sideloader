@@ -11,12 +11,28 @@ runs:
     - name: Set-up macOS cross-compilation
       shell: bash
       run: |
+        set -e
         mkdir -p $HOME/.ldc/
         LDC_VERSION=$(ldc2 --version | head -n 1 | grep -oE "[0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*")
-        curl -LO https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.0.sdk.tar.xz
+        echo "LDC Version: $LDC_VERSION"
+        
+        # Download macOS SDK with retry
+        for i in {1..3}; do
+          if curl -LO https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.0.sdk.tar.xz; then
+            break
+          elif [ $i -eq 3 ]; then
+            echo "Failed to download macOS SDK after 3 attempts"
+            exit 1
+          else
+            echo "Download attempt $i failed, retrying..."
+            sleep 5
+          fi
+        done
+        
         tar -xf ./MacOSX11.0.sdk.tar.xz -C $HOME
-        cp $(dirname $(which ldc2))/../etc/ldc2.conf $HOME/.ldc/ldc2.conf
-        cat << EOF | tee $HOME/.ldc/ldc2.conf
+        cp $(dirname $(which ldc2))/../etc/ldc2.conf $HOME/.ldc/ldc2.conf || echo "Warning: Could not copy original ldc2.conf"
+        
+        cat << 'EOF' > $HOME/.ldc/ldc2.conf
         "arm64-apple-macos":
         {
             // default switches injected before all explicit command-line switches
@@ -46,6 +62,20 @@ runs:
             ];
         };
         EOF
-        mkdir $HOME/ldc-macos
-        curl -LO https://github.com/ldc-developers/ldc/releases/download/v$LDC_VERSION/ldc2-$LDC_VERSION-osx-arm64.tar.xz
+        
+        # Download LDC macOS runtime with retry
+        mkdir -p $HOME/ldc-macos
+        for i in {1..3}; do
+          if curl -LO https://github.com/ldc-developers/ldc/releases/download/v$LDC_VERSION/ldc2-$LDC_VERSION-osx-arm64.tar.xz; then
+            break
+          elif [ $i -eq 3 ]; then
+            echo "Failed to download LDC macOS runtime after 3 attempts"
+            exit 1
+          else
+            echo "LDC download attempt $i failed, retrying..."
+            sleep 5
+          fi
+        done
+        
         tar -xf ./ldc2-$LDC_VERSION-osx-arm64.tar.xz -C $HOME
+        echo "Cross-compilation setup completed successfully"
