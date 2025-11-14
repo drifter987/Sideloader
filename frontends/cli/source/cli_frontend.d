@@ -234,7 +234,7 @@ int entryPoint(Commands commands)
             defaultPoolThreads = commands.threadCount;
         }
     } catch (Exception ex) {
-        getLogger().warning("Failed to set thread pool size: " ~ ex.msg);
+        getLogger().info("Failed to set thread pool size: " ~ ex.msg);
     }
 
     try
