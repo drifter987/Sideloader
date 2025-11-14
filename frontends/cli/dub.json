@@ -15,7 +15,12 @@
         "slf4d": "~>2"
     },
     "dflags-ldc": [
-        "--link-defaultlib-shared=false"
+        "--link-defaultlib-shared=false",
+        "--disable-gc2stack"
+    ],
+    
+    "lflags-osx": [
+        "-lpthread"
     ],
 
     "dflags-gdc": [

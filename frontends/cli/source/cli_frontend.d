@@ -227,8 +227,11 @@ int entryPoint(Commands commands)
         setlocale(LC_ALL, "");
     }
 
-    defaultPoolThreads = commands.threadCount;
     configureLoggingProvider(new shared DefaultProvider(true, commands.debug_ ? Levels.DEBUG : Levels.INFO));
+    
+    if (commands.threadCount != uint.max) {
+        defaultPoolThreads = commands.threadCount;
+    }
 
     try
     {
