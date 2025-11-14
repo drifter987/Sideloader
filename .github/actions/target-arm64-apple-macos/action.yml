@@ -6,7 +6,11 @@ runs:
   steps:
     - name: Install Clang
       shell: bash
-      run: sudo apt-get install -y clang lld
+      run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+        echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-16 main" | sudo tee /etc/apt/sources.list.d/llvm.list
+        sudo apt-get update
+        sudo apt-get install -y clang-16 lld-16
 
     - name: Set-up macOS cross-compilation
       shell: bash
@@ -38,8 +42,8 @@ runs:
         {
             // default switches injected before all explicit command-line switches
             switches = [
-                "-gcc=clang",
-                "-linker=lld-15",
+                "-gcc=clang-16",
+                "-linker=lld-16",
                 "-Xcc=-target",
                 "-Xcc=arm64-apple-macos",
                 "-Xcc=-isysroot",
