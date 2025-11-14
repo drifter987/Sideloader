@@ -32,7 +32,8 @@ runs:
         tar -xf ./MacOSX11.0.sdk.tar.xz -C $HOME
         cp $(dirname $(which ldc2))/../etc/ldc2.conf $HOME/.ldc/ldc2.conf || echo "Warning: Could not copy original ldc2.conf"
         
-        cat << 'EOF' > $HOME/.ldc/ldc2.conf
+        # Write ldc2.conf with proper variable expansion
+        cat << EOF > $HOME/.ldc/ldc2.conf
         "arm64-apple-macos":
         {
             // default switches injected before all explicit command-line switches
@@ -78,4 +79,14 @@ runs:
         done
         
         tar -xf ./ldc2-$LDC_VERSION-osx-arm64.tar.xz -C $HOME
+        
+        # Verify the setup
+        echo "Verifying cross-compilation setup:"
+        echo "LDC version: $LDC_VERSION"
+        echo "Home directory: $HOME"
+        ls -la $HOME/ldc2-$LDC_VERSION-osx-arm64/ || echo "LDC macOS directory not found"
+        ls -la $HOME/MacOSX11.0.sdk/ || echo "macOS SDK not found"
+        
+        echo "LDC2 configuration:"
+        cat $HOME/.ldc/ldc2.conf
         echo "Cross-compilation setup completed successfully"
